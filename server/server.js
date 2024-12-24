@@ -16,7 +16,9 @@ app.use(cors({
     'http://localhost:3001', 
     'http://localhost:3000',
     'https://note-app-frontend.onrender.com', // Thêm domain frontend trên Render
-    'https://circleci-demo-frontend.onrender.com' // Thêm domain frontend mới
+    'https://circleci-demo-frontend.onrender.com', // Thêm domain frontend mới
+    'https://circleci-demo-1.onrender.com', // Thêm domain frontend mới
+    '*' // Tạm thời cho phép tất cả origins trong quá trình development
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true

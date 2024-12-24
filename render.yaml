@@ -10,10 +10,10 @@ services:
       - key: PORT
         value: 10000
       - key: CORS_ORIGIN
-        value: https://note-app-frontend.onrender.com
+        value: https://circleci-demo-1.onrender.com
 
   - type: web
-    name: circleci-demo-frontend
+    name: circleci-demo-1
     env: static
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/build
