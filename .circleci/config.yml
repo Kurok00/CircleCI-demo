@@ -43,12 +43,16 @@ jobs:
       - image: cimg/node:18.0
     steps:
       - checkout
-      - node/install-packages:
-          app-dir: ./server
       - run:
-          name: Sync package-lock.json
+          name: Install Server Dependencies
           command: |
             cd server
+            npm install  # Ensure package-lock.json is in sync
+            git diff --exit-code || (echo "package-lock.json updated, committing changes" && git add package-lock.json && git commit -m "Update package-lock.json")
+      - run:
+          name: Install Client Dependencies
+          command: |
+            cd client
             npm install  # Ensure package-lock.json is in sync
             git diff --exit-code || (echo "package-lock.json updated, committing changes" && git add package-lock.json && git commit -m "Update package-lock.json")
       - run:
