@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Container, Typography, Box, TextField, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';  // Fixed the incorrect path
+import EditIcon from '@mui/icons-material.Edit';  // Fixed the incorrect path
 import axios from 'axios';
+
+// Thay đổi cách lấy API_URL
+const API_URL = 'https://note-app-backend.onrender.com';  // URL backend thực tế trên Render
 
 function App() {
   const [notes, setNotes] = useState([]);
@@ -12,7 +15,7 @@ function App() {
 
   const fetchNotes = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/notes');
+      const response = await axios.get(`${API_URL}/api/notes`);
       setNotes(response.data);
     } catch (error) {
       console.error('Error fetching notes:', error);
@@ -27,10 +30,10 @@ function App() {
     e.preventDefault();
     try {
       if (editingId) {
-        await axios.put(`http://localhost:3000/api/notes/${editingId}`, { title, content });
+        await axios.put(`${API_URL}/api/notes/${editingId}`, { title, content });
         setEditingId(null);
       } else {
-        await axios.post('http://localhost:3000/api/notes', { title, content });
+        await axios.post(`${API_URL}/api/notes`, { title, content });
       }
       setTitle('');
       setContent('');
@@ -48,7 +51,7 @@ function App() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/notes/${id}`);
+      await axios.delete(`${API_URL}/api/notes/${id}`);
       fetchNotes();
     } catch (error) {
       console.error('Error deleting note:', error);

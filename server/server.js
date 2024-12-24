@@ -12,7 +12,12 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors({
-  origin: ['http://localhost:3001', 'http://localhost:3000', 'https://your-render-frontend-url.onrender.com'],
+  origin: [
+    'http://localhost:3001', 
+    'http://localhost:3000',
+    'https://note-app-frontend.onrender.com', // Thêm domain frontend trên Render
+    'https://note-app-frontend.onrender.com/'  // Thêm cả trailing slash
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));

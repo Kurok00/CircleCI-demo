@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: note-app-backend
+    env: node
+    buildCommand: cd server && npm install
+    startCommand: cd server && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CORS_ORIGIN
+        value: https://note-app-frontend.onrender.com
+
+  - type: web
+    name: note-app-frontend
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://note-app-backend.onrender.com # Thay đổi theo URL backend của bạn
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
