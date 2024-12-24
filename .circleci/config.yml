@@ -59,11 +59,26 @@ jobs:
       - notify-telegram:
           status: success
           step: "Build & Test"
-      # Sửa phần notify fail - dùng notify-telegram command trực tiếp
-      - notify-telegram:
+      # Fix: Add post-steps for handling failure
+      - run:
+          name: Notify on failure
           when: on_fail
-          status: failed 
-          step: "Build & Test"
+          command: |
+            if [ "$CIRCLE_JOB" = "build" ]; then
+              STEP_NAME="Build"
+            else
+              STEP_NAME="Deploy"
+            fi
+            
+            EMOJI="❌"
+            STATUS="thất bại"
+            
+            MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> ${STEP_NAME} ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
+            
+            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+              -d "chat_id=6894773989" \
+              -d "text=${MESSAGE}" \
+              -d "parse_mode=HTML"
 
   deploy:
     docker:
