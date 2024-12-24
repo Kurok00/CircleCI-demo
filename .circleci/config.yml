@@ -14,6 +14,7 @@ commands:
     steps:
       - run:
           name: Notify Telegram
+          when: always
           command: |
             if [ "<< parameters.status >>" = "success" ]; then
               EMOJI="✅"
@@ -22,26 +23,17 @@ commands:
               EMOJI="❌"
               STATUS="thất bại"
             fi
-
-            # Get commit info
+            
             COMMIT_MSG=$(git log -1 --pretty=%B)
             COMMIT_HASH=$(git rev-parse --short HEAD)
             COMMIT_URL="https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commit/$CIRCLE_SHA1"
             
-            MESSAGE="${EMOJI} *${CIRCLE_PROJECT_REPONAME}*
+            MESSAGE="${EMOJI} *${CIRCLE_PROJECT_REPONAME}*\n\n🔄 *Trạng thái*: << parameters.step >> ${STATUS}\n👤 *Branch*: ${CIRCLE_BRANCH}\n🏗️ *Build*: #${CIRCLE_BUILD_NUM}\n📝 *Commit*: <a href='${COMMIT_URL}'>${COMMIT_HASH}</a>\n💬 *Message*: ${COMMIT_MSG}\n⏱️ *Thời gian*: $(date '+%Y-%m-%d %H:%M:%S')"
             
-🔄 *Trạng thái*: << parameters.step >> ${STATUS}
-👤 *Branch*: ${CIRCLE_BRANCH}
-🏗️ *Build*: #${CIRCLE_BUILD_NUM}
-📝 *Commit*: <a href='${COMMIT_URL}'>${COMMIT_HASH}</a>
-💬 *Message*: ${COMMIT_MSG}
-⏱️ *Thời gian*: $(date '+%Y-%m-%d %H:%M:%S')"
-
-            curl -s -X POST https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage \
-              -d chat_id=6894773989 \
-              -d text="${MESSAGE}" \
-              -d parse_mode="HTML"
-          when: always
+            curl -s -X POST "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+              -d "chat_id=6894773989" \
+              -d "text=${MESSAGE}" \
+              -d "parse_mode=HTML"
 
 jobs:
   build:
