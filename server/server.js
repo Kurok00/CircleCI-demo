@@ -107,62 +107,62 @@ app.get('/api/status', (req, res) => {
 // Add API documentation endpoint
 app.get('/api/docs', (req, res) => {
   const apiDocs = {
-    name: "Note App API Documentation",
-    version: "1.0.0",
-    baseUrl: "https://circleci-demo.onrender.com",
+    name: 'Note App API Documentation',
+    version: '1.0.0',
+    baseUrl: 'https://circleci-demo.onrender.com',
     endpoints: [
       {
-        path: "/",
-        method: "GET",
-        description: "Welcome message"
+        path: '/',
+        method: 'GET',
+        description: 'Welcome message'
       },
       {
-        path: "/health",
-        method: "GET",
-        description: "Health check endpoint"
+        path: '/health',
+        method: 'GET',
+        description: 'Health check endpoint'
       },
       {
-        path: "/api/status",
-        method: "GET",
-        description: "API status with timestamp"
+        path: '/api/status',
+        method: 'GET',
+        description: 'API status with timestamp'
       },
       {
-        path: "/api/notes",
-        method: "GET",
-        description: "Get all notes"
+        path: '/api/notes',
+        method: 'GET',
+        description: 'Get all notes'
       },
       {
-        path: "/api/notes",
-        method: "POST",
-        description: "Create a new note",
+        path: '/api/notes',
+        method: 'POST',
+        description: 'Create a new note',
         body: {
-          title: "string (required)",
-          content: "string (required)"
+          title: 'string (required)',
+          content: 'string (required)'
         }
       },
       {
-        path: "/api/notes/:id",
-        method: "PUT",
-        description: "Update a note by ID",
+        path: '/api/notes/:id',
+        method: 'PUT',
+        description: 'Update a note by ID',
         body: {
-          title: "string (required)",
-          content: "string (required)"
+          title: 'string (required)',
+          content: 'string (required)'
         }
       },
       {
-        path: "/api/notes/:id",
-        method: "DELETE",
-        description: "Delete a note by ID"
+        path: '/api/notes/:id',
+        method: 'DELETE',
+        description: 'Delete a note by ID'
       },
       {
-        path: "/webhook/circle-ci",
-        method: "POST",
-        description: "CircleCI webhook endpoint"
+        path: '/webhook/circle-ci',
+        method: 'POST',
+        description: 'CircleCI webhook endpoint'
       },
       {
-        path: "/api/docs",
-        method: "GET",
-        description: "This API documentation"
+        path: '/api/docs',
+        method: 'GET',
+        description: 'This API documentation'
       }
     ]
   };
