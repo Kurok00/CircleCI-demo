@@ -18,6 +18,14 @@ describe('GET /api/status', () => {
   });
 });
 
+describe('GET /health', () => {
+  it('should return healthy status', async () => {
+    const res = await request(app).get('/health');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.status).toBe('healthy');
+  });
+});
+
 // Thêm afterAll để đóng server sau khi tests hoàn thành
 afterAll(async () => {
   await closeServer();
