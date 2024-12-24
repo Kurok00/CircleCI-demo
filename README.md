@@ -4,6 +4,7 @@ A full-stack note application with modern DevOps practices including CI/CD pipel
 
 ✅ Backend:
 🔗 https://circleci-demo.onrender.com
+✅ Backend All Endpoint :https://circleci-demo.onrender.com/api/docs
 
 ✅ Frontend:
 🔗 https://circleci-demo-1.onrender.com
