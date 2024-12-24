@@ -46,20 +46,9 @@ jobs:
           command: |
             cd server
             npm install
-      - run:
-          name: Notify Success
-          command: |
-            if [ "$?" = "0" ]; then
-              /bin/bash -c "$(curl -s "https://raw.githubusercontent.com/$(CIRCLE_PROJECT_USERNAME)/$(CIRCLE_PROJECT_REPONAME)/$(CIRCLE_SHA1)/.circleci/notify-telegram.sh")" success "Build"
-            fi
-          when: on_success
-      - run:
-          name: Notify Failure
-          command: |
-            if [ "$?" != "0" ]; then
-              /bin/bash -c "$(curl -s "https://raw.githubusercontent.com/$(CIRCLE_PROJECT_USERNAME)/$(CIRCLE_PROJECT_REPONAME)/$(CIRCLE_SHA1)/.circleci/notify-telegram.sh")" failed "Build"
-            fi
-          when: on_fail
+      - notify-telegram:
+          status: success
+          step: "Build"
 
   deploy:
     docker:
@@ -74,20 +63,9 @@ jobs:
               -H "Accept: application/json" \
               -H "Content-Type: application/json" \
               "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"
-      - run:
-          name: Notify Success
-          command: |
-            if [ "$?" = "0" ]; then
-              /bin/bash -c "$(curl -s "https://raw.githubusercontent.com/$(CIRCLE_PROJECT_USERNAME)/$(CIRCLE_PROJECT_REPONAME)/$(CIRCLE_SHA1)/.circleci/notify-telegram.sh")" success "Deploy"
-            fi
-          when: on_success
-      - run:
-          name: Notify Failure
-          command: |
-            if [ "$?" != "0" ]; then
-              /bin/bash -c "$(curl -s "https://raw.githubusercontent.com/$(CIRCLE_PROJECT_USERNAME)/$(CIRCLE_PROJECT_REPONAME)/$(CIRCLE_SHA1)/.circleci/notify-telegram.sh")" failed "Deploy"
-            fi
-          when: on_fail
+      - notify-telegram:
+          status: success
+          step: "Deploy"
 
 workflows:
   version: 2
