@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Container, Typography, Box, TextField, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material.Edit';  // Fixed the incorrect path
+import EditIcon from '@mui/icons-material/Edit';  // Fixed import path - removed dot
 import axios from 'axios';
 
 // Thay đổi cách lấy API_URL
-const API_URL = 'https://note-app-backend.onrender.com';  // URL backend thực tế trên Render
+const API_URL = 'https://circleci-demo.onrender.com';  // Cập nhật URL backend
 
 function App() {
   const [notes, setNotes] = useState([]);

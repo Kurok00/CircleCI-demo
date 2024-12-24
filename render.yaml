@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: note-app-backend
+    name: circleci-demo
     env: node
     buildCommand: cd server && npm install
     startCommand: cd server && node server.js
@@ -13,13 +13,13 @@ services:
         value: https://note-app-frontend.onrender.com
 
   - type: web
-    name: note-app-frontend
+    name: circleci-demo-frontend
     env: static
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://note-app-backend.onrender.com # Thay đổi theo URL backend của bạn
+        value: https://circleci-demo.onrender.com
     routes:
       - type: rewrite
         source: /*
