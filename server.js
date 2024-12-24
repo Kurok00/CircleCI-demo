@@ -10,7 +10,7 @@ app.get('/health', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.json({ message: 'Hello World!' });
+  res.json({ message: 'Hello World! test 1nd' });
 });
 
 app.get('/api/status', (req, res) => {
