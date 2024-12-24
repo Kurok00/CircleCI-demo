@@ -59,12 +59,11 @@ jobs:
       - notify-telegram:
           status: success
           step: "Build & Test"
-      - run:
+      # Sửa phần notify fail - dùng notify-telegram command trực tiếp
+      - notify-telegram:
           when: on_fail
-          command: |
-            notify-telegram:
-              status: failed
-              step: "Build & Test"
+          status: failed 
+          step: "Build & Test"
 
   deploy:
     docker:

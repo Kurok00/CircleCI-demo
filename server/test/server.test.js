@@ -31,6 +31,36 @@ describe('GET /health', () => {
   });
 });
 
+describe('POST /webhook/circle-ci', () => {
+  it('should handle successful build notification', async () => {
+    const mockSuccessPayload = {
+      outcome: 'success',
+      build_num: '123',
+      reponame: 'test-repo'
+    };
+    
+    const res = await request(app)
+      .post('/webhook/circle-ci')
+      .send(mockSuccessPayload);
+      
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('should handle failed build notification', async () => {
+    const mockFailPayload = {
+      outcome: 'failed',
+      build_num: '124',
+      reponame: 'test-repo'
+    };
+    
+    const res = await request(app)
+      .post('/webhook/circle-ci')
+      .send(mockFailPayload);
+      
+    expect(res.statusCode).toBe(200);
+  });
+});
+
 // Thêm afterAll để đóng server sau khi tests hoàn thành
 afterAll(async () => {
   await closeServer();
