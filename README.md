@@ -1,4 +1,4 @@
-# Note App with DevOps Pipeline ...
+# Note App with DevOps Pipeline 
 
 A full-stack note application with modern DevOps practices including CI/CD pipeline, Docker containerization, and cloud deployment.
 
