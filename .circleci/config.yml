@@ -60,14 +60,7 @@ jobs:
           name: Build Project
           command: |
             cd server
-            if npm install; then
-              notify-telegram:
-                status: success
-                step: "Build"
-            else
-              notify-telegram:
-                status: failed
-                step: "Build"
+            if ! npm install; then
               exit 1
             fi
       - notify-telegram:
@@ -89,17 +82,10 @@ jobs:
           no_output_timeout: 30m
           command: |
             echo "Deploying to production..."
-            if curl -X POST \
+            if ! curl -X POST \
               -H "Accept: application/json" \
               -H "Content-Type: application/json" \
               "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"; then
-              notify-telegram:
-                status: success
-                step: "Deploy"
-            else
-              notify-telegram:
-                status: failed
-                step: "Deploy"
               exit 1
             fi
       - notify-telegram:
