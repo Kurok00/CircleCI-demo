@@ -8,16 +8,39 @@ commands:
     parameters:
       status:
         type: string
+      step:
+        type: string
+        default: "build"
     steps:
       - run:
           name: Notify Telegram
           command: |
             if [ "<< parameters.status >>" = "success" ]; then
-              MESSAGE="✅ $CIRCLE_PROJECT_REPONAME: Build #$CIRCLE_BUILD_NUM passed on $CIRCLE_BRANCH"
+              EMOJI="✅"
+              STATUS="thành công"
             else
-              MESSAGE="❌ $CIRCLE_PROJECT_REPONAME: Build #$CIRCLE_BUILD_NUM failed on $CIRCLE_BRANCH"
+              EMOJI="❌"
+              STATUS="thất bại"
             fi
-            curl -s -X POST https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage -d chat_id=6894773989 -d text="$MESSAGE" -d parse_mode="HTML"
+
+            # Get commit info
+            COMMIT_MSG=$(git log -1 --pretty=%B)
+            COMMIT_HASH=$(git rev-parse --short HEAD)
+            COMMIT_URL="https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commit/$CIRCLE_SHA1"
+            
+            MESSAGE="${EMOJI} *${CIRCLE_PROJECT_REPONAME}*
+            
+🔄 *Trạng thái*: << parameters.step >> ${STATUS}
+👤 *Branch*: ${CIRCLE_BRANCH}
+🏗️ *Build*: #${CIRCLE_BUILD_NUM}
+📝 *Commit*: <a href='${COMMIT_URL}'>${COMMIT_HASH}</a>
+💬 *Message*: ${COMMIT_MSG}
+⏱️ *Thời gian*: $(date '+%Y-%m-%d %H:%M:%S')"
+
+            curl -s -X POST https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage \
+              -d chat_id=6894773989 \
+              -d text="${MESSAGE}" \
+              -d parse_mode="HTML"
           when: always
 
 jobs:
@@ -28,6 +51,7 @@ jobs:
       - checkout
       - notify-telegram:
           status: success
+          step: "Build"
 
   deploy:
     docker:
@@ -38,14 +62,13 @@ jobs:
           name: Deploy to Production
           command: |
             echo "Deploying to production..."
-            if [ "${CIRCLE_BRANCH}" = "master" ] || [ "${CIRCLE_BRANCH}" = "main" ]; then
-              curl -X POST \
-                -H "Accept: application/json" \
-                -H "Content-Type: application/json" \
-                "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"
-              notify-telegram:
-                status: success
-            fi
+            curl -X POST \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"
+      - notify-telegram:
+          status: success
+          step: "Deploy"
 
 workflows:
   version: 2
