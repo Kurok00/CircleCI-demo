@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "build": "cd client && npm install && npm run build",
-    "dev": "concurrently \"npm run start\" \"cd client && npm start\""
+    "dev": "concurrently \"npm run start\" \"cd client && npm start\"",
+    "test": "jest",
+    "lint": "eslint ."
   },
   "engines": {
     "node": "18.x",
@@ -18,5 +20,10 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "mongoose": "^6.13.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.40.0",
+    "jest": "^29.5.0",
+    "supertest": "^6.3.3"
   }
 }

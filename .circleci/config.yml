@@ -43,21 +43,28 @@ jobs:
       - image: cimg/node:18.0
     steps:
       - checkout
+      - node/install-packages:
+          app-dir: ./server
       - run:
-          name: Build Project
+          name: Run Linting
           command: |
             cd server
-            npm install
-          no_output_timeout: 10m
+            npm install eslint --save-dev
+            npm run lint
+      - run:
+          name: Run Tests
+          command: |
+            cd server
+            npm test
       - notify-telegram:
           status: success
-          step: "Build"
+          step: "Build & Test"
       - run:
           when: on_fail
           command: |
             notify-telegram:
               status: failed
-              step: "Build"
+              step: "Build & Test"
 
   deploy:
     docker:
