@@ -16,6 +16,12 @@ commands:
           name: Notify Telegram
           when: always
           command: |
+            if [ "$CIRCLE_JOB" = "build" ]; then
+              STEP_NAME="Build"
+            else
+              STEP_NAME="Deploy"
+            fi
+
             if [ "<< parameters.status >>" = "success" ]; then
               EMOJI="✅"
               STATUS="thành công"
@@ -24,13 +30,9 @@ commands:
               STATUS="thất bại"
             fi
             
-            COMMIT_MSG=$(git log -1 --pretty=%B | sed 's/"/\\"/g')
-            COMMIT_HASH=$(git rev-parse --short HEAD)
-            COMMIT_URL="https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commit/$CIRCLE_SHA1"
+            MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> ${STEP_NAME} ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
             
-            MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> << parameters.step >> ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> <a href='${COMMIT_URL}'>${COMMIT_HASH}</a>%0A💬 <b>Message:</b> ${COMMIT_MSG}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
-            
-            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kKsB42Fg/sendMessage" \
+            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
               -d "chat_id=6894773989" \
               -d "text=${MESSAGE}" \
               -d "parse_mode=HTML"
@@ -46,9 +48,16 @@ jobs:
           command: |
             cd server
             npm install
+          no_output_timeout: 10m
       - notify-telegram:
           status: success
           step: "Build"
+      - run:
+          when: on_fail
+          command: |
+            notify-telegram:
+              status: failed
+              step: "Build"
 
   deploy:
     docker:
