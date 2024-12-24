@@ -11,31 +11,62 @@ commands:
       step:
         type: string
         default: "build"
+      service:
+        type: string
+        default: "CircleCI"
     steps:
       - run:
           name: Notify Telegram
           when: always
           command: |
-            if [ "$CIRCLE_JOB" = "build" ]; then
-              STEP_NAME="Build"
-            else
-              STEP_NAME="Deploy"
+            # Function to send Telegram message
+            send_telegram_message() {
+              local MESSAGE="$1"
+              curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+                -d "chat_id=6894773989" \
+                -d "text=${MESSAGE}" \
+                -d "parse_mode=HTML"
+            }
+
+            # CircleCI notification
+            if [ "<< parameters.service >>" = "CircleCI" ]; then
+              if [ "<< parameters.status >>" = "success" ]; then
+                EMOJI="✅"
+                STATUS="thành công"
+              else
+                EMOJI="❌"
+                STATUS="thất bại"
+              fi
+              
+              MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> << parameters.step >> ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
+              send_telegram_message "${MESSAGE}"
             fi
 
-            if [ "<< parameters.status >>" = "success" ]; then
-              EMOJI="✅"
-              STATUS="thành công"
-            else
-              EMOJI="❌"
-              STATUS="thất bại"
+            # Render deployment monitoring
+            if [ "<< parameters.service >>" = "Render" ]; then
+              # Monitor backend deployment
+              BACKEND_STATUS=$(curl -s https://circleci-demo.onrender.com/health | jq -r '.status')
+              if [ "$BACKEND_STATUS" = "healthy" ]; then
+                BACKEND_EMOJI="✅"
+                BACKEND_STATUS_MSG="hoạt động"
+              else
+                BACKEND_EMOJI="❌"
+                BACKEND_STATUS_MSG="không hoạt động"
+              fi
+
+              # Monitor frontend by checking if the page loads
+              if curl -s -f https://circleci-demo-1.onrender.com > /dev/null; then
+                FRONTEND_EMOJI="✅"
+                FRONTEND_STATUS_MSG="hoạt động"
+              else
+                FRONTEND_EMOJI="❌"
+                FRONTEND_STATUS_MSG="không hoạt động"
+              fi
+
+              # Send Render deployment status
+              MESSAGE="🚀 <b>Render Deployment Status</b>%0A%0A${BACKEND_EMOJI} <b>Backend:</b> ${BACKEND_STATUS_MSG}%0A🔗 https://circleci-demo.onrender.com%0A%0A${FRONTEND_EMOJI} <b>Frontend:</b> ${FRONTEND_STATUS_MSG}%0A🔗 https://circleci-demo-1.onrender.com%0A%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
+              send_telegram_message "${MESSAGE}"
             fi
-            
-            MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> ${STEP_NAME} ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
-            
-            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
-              -d "chat_id=6894773989" \
-              -d "text=${MESSAGE}" \
-              -d "parse_mode=HTML"
 
 jobs:
   build:
@@ -105,9 +136,17 @@ jobs:
               "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"
             
             echo "Deployment triggered successfully. Check Render dashboard for status."
+      - run:
+          name: Wait for Deployment and Monitor Status
+          command: |
+            echo "Waiting for deployments to stabilize..."
+            sleep 120  # Wait for 2 minutes
+      
+      # Notify Render deployment status
       - notify-telegram:
           status: success
           step: "Deploy"
+          service: "Render"
 
 workflows:
   version: 2
