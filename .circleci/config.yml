@@ -10,10 +10,12 @@ jobs:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
       - run:
-          name: Install Dependencies
+          name: Update NPM
           command: |
-            sudo npm install -g npm@8
-            npm ci
+            npm install -g npm@8
+      - run:
+          name: Install Dependencies
+          command: npm install
       - save_cache:
           paths:
             - node_modules
