@@ -56,7 +56,7 @@ jobs:
           command: |
             cd server
             npm test
-      # Thay đổi logic notify để chỉ gửi một thông báo
+      # Fix notification logic
       - run:
           name: Notify Build Status
           when: always
@@ -67,7 +67,8 @@ jobs:
               STEP_NAME="Deploy"
             fi
 
-            if [ "${CIRCLE_JOB}" = "success" ]; then
+            # Fix: Check actual build status
+            if [ "$?" = "0" ]; then
               EMOJI="✅"
               STATUS="thành công"
             else
