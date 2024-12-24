@@ -46,12 +46,16 @@ jobs:
       - node/install-packages:
           app-dir: ./server
       - run:
+          name: Sync package-lock.json
+          command: |
+            cd server
+            npm install  # Ensure package-lock.json is in sync
+      - run:
           name: Run Linting and Tests
           command: |
             cd server
-            npm install eslint --save-dev
-            npm install  # Ensure package-lock.json is in sync
             npm ci  # Clean install dependencies
+            npm install eslint --save-dev
             # Store lint result
             npm run lint
             LINT_RESULT=$?
