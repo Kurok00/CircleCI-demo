@@ -16,6 +16,9 @@ jobs:
       - run:
           name: Install Dependencies
           command: npm install
+      - run:
+          name: Set Jest Permissions
+          command: chmod +x node_modules/.bin/jest
       - save_cache:
           paths:
             - node_modules
