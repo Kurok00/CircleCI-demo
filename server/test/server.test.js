@@ -1,5 +1,10 @@
 const request = require('supertest');
-const { app, closeServer } = require('../server');
+const mongoose = require('mongoose');
+const { app, closeServer, connectDB } = require('../server');
+
+beforeAll(async () => {
+  await connectDB();
+});
 
 describe('GET /', () => {
   it('should return Hello World message', async () => {

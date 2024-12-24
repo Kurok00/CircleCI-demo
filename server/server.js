@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const Note = require('./models/Note');
 require('dotenv').config();
 
+// Configure mongoose
+mongoose.set('strictQuery', false);
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -14,10 +17,21 @@ app.use(cors({
   credentials: true
 }));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Modified mongoose connection
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    console.log('Connected to MongoDB');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  }
+};
+
+// Only connect if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // CRUD APIs for notes
 app.get('/api/notes', async (req, res) => {
@@ -93,12 +107,15 @@ const server = app.listen(port, '0.0.0.0', () => {
 });
 
 // Thêm function để đóng server
-const closeServer = () => {
-  return new Promise((resolve) => {
-    server.close(() => {
-      resolve();
+const closeServer = async () => {
+  try {
+    await mongoose.connection.close();
+    await new Promise((resolve) => {
+      server.close(resolve);
     });
-  });
+  } catch (err) {
+    console.error('Error during cleanup:', err);
+  }
 };
 
-module.exports = { app, closeServer };
+module.exports = { app, closeServer, connectDB };
