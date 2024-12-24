@@ -26,7 +26,7 @@ commands:
             fi
             
             # Create notification message
-            MESSAGE="${EMOJI} *<< parameters.step >>*%0A%0A*Project:* ${CIRCLE_PROJECT_REPONAME}%0A*Branch:* ${CIRCLE_BRANCH}%0A*Status:* ${STATUS}%0A*Build:* #${CIRCLE_BUILD_NUM}%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
+            MESSAGE="${EMOJI} *<< parameters.step >>*%0A%0A*Project:* CircleCI Demo%0A*Branch:* ${CIRCLE_BRANCH}%0A*Status:* ${STATUS}%0A*Build:* #${CIRCLE_BUILD_NUM}%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
             
             # Escape special characters
             MESSAGE=$(echo "$MESSAGE" | sed 's/\&/\\&/g' | sed 's/\*/\\*/g' | sed 's/\_/\\_/g' | sed 's/\`/\\`/g')
