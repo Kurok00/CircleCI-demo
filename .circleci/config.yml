@@ -44,6 +44,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Configure Git
+          command: |
+            git config --global user.email "circleci@example.com"
+            git config --global user.name "CircleCI"
+      - run:
           name: Install Server Dependencies
           command: |
             cd server
