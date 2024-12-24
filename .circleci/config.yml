@@ -56,22 +56,24 @@ jobs:
           command: |
             cd server
             npm test
-      - notify-telegram:
-          status: success
-          step: "Build & Test"
-      # Fix: Add post-steps for handling failure
+      # Thay đổi logic notify để chỉ gửi một thông báo
       - run:
-          name: Notify on failure
-          when: on_fail
+          name: Notify Build Status
+          when: always
           command: |
             if [ "$CIRCLE_JOB" = "build" ]; then
               STEP_NAME="Build"
             else
               STEP_NAME="Deploy"
             fi
-            
-            EMOJI="❌"
-            STATUS="thất bại"
+
+            if [ "${CIRCLE_JOB}" = "success" ]; then
+              EMOJI="✅"
+              STATUS="thành công"
+            else
+              EMOJI="❌"
+              STATUS="thất bại"
+            fi
             
             MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> ${STEP_NAME} ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
             
