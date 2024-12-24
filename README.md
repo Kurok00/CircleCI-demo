@@ -30,13 +30,13 @@ git clone https://github.com/Kurok00/CircleCI-demo.git
 
 cd <project-directory>
 
-# 2. Install dependencies:
+## 2. Install dependencies:
 
-# Install server dependencies
+## Install server dependencies
 cd server
 npm install
 
-# Install client dependencies
+## Install client dependencies
 cd ../client
 npm install
 
