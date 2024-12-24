@@ -11,62 +11,28 @@ commands:
       step:
         type: string
         default: "build"
-      service:
-        type: string
-        default: "CircleCI"
     steps:
       - run:
           name: Notify Telegram
           when: always
           command: |
-            # Function to send Telegram message
-            send_telegram_message() {
-              local MESSAGE="$1"
-              curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
-                -d "chat_id=6894773989" \
-                -d "text=${MESSAGE}" \
-                -d "parse_mode=HTML"
-            }
-
-            # CircleCI notification
-            if [ "<< parameters.service >>" = "CircleCI" ]; then
-              if [ "<< parameters.status >>" = "success" ]; then
-                EMOJI="✅"
-                STATUS="thành công"
-              else
-                EMOJI="❌"
-                STATUS="thất bại"
-              fi
-              
-              MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> << parameters.step >> ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
-              send_telegram_message "${MESSAGE}"
+            # Determine emoji and status message
+            if [ "<< parameters.status >>" = "success" ]; then
+              EMOJI="✅"
+              STATUS="thành công"
+            else
+              EMOJI="❌"
+              STATUS="thất bại"
             fi
-
-            # Render deployment monitoring
-            if [ "<< parameters.service >>" = "Render" ]; then
-              # Monitor backend deployment
-              BACKEND_STATUS=$(curl -s https://circleci-demo.onrender.com/health | jq -r '.status')
-              if [ "$BACKEND_STATUS" = "healthy" ]; then
-                BACKEND_EMOJI="✅"
-                BACKEND_STATUS_MSG="hoạt động"
-              else
-                BACKEND_EMOJI="❌"
-                BACKEND_STATUS_MSG="không hoạt động"
-              fi
-
-              # Monitor frontend by checking if the page loads
-              if curl -s -f https://circleci-demo-1.onrender.com > /dev/null; then
-                FRONTEND_EMOJI="✅"
-                FRONTEND_STATUS_MSG="hoạt động"
-              else
-                FRONTEND_EMOJI="❌"
-                FRONTEND_STATUS_MSG="không hoạt động"
-              fi
-
-              # Send Render deployment status
-              MESSAGE="🚀 <b>Render Deployment Status</b>%0A%0A${BACKEND_EMOJI} <b>Backend:</b> ${BACKEND_STATUS_MSG}%0A🔗 https://circleci-demo.onrender.com%0A%0A${FRONTEND_EMOJI} <b>Frontend:</b> ${FRONTEND_STATUS_MSG}%0A🔗 https://circleci-demo-1.onrender.com%0A%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
-              send_telegram_message "${MESSAGE}"
-            fi
+            
+            # Create notification message
+            MESSAGE="${EMOJI} *<< parameters.step >>*%0A%0A*Project:* ${CIRCLE_PROJECT_REPONAME}%0A*Branch:* ${CIRCLE_BRANCH}%0A*Status:* ${STATUS}%0A*Build:* #${CIRCLE_BUILD_NUM}%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
+            
+            # Send to Telegram
+            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+              -d "chat_id=6894773989" \
+              -d "text=${MESSAGE}" \
+              -d "parse_mode=Markdown"
 
 jobs:
   build:
@@ -100,33 +66,15 @@ jobs:
             # Exit with error if either lint or test failed
             [ $LINT_RESULT -eq 0 ] && [ $TEST_RESULT -eq 0 ]
       
+      - notify-telegram:
+          status: success
+          step: "Build & Test"
       - run:
-          name: Notify Build Status
-          when: always
+          when: on_fail
           command: |
-            # Source build status
-            source /tmp/build_status
-            
-            if [ "$LINT_RESULT" = "0" ] && [ "$TEST_RESULT" = "0" ]; then
-              EMOJI="✅"
-              STATUS="thành công"
-              DETAILS=""
-            else
-              EMOJI="❌"
-              STATUS="thất bại"
-              if [ "$LINT_RESULT" != "0" ]; then
-                DETAILS="%0A❌ Lỗi ESLint - Kiểm tra định dạng code"
-              elif [ "$TEST_RESULT" != "0" ]; then
-                DETAILS="%0A❌ Lỗi Tests - Kiểm tra unit test"
-              fi
-            fi
-            
-            MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> Build ${STATUS}${DETAILS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> ${CIRCLE_SHA1}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
-            
-            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
-              -d "chat_id=6894773989" \
-              -d "text=${MESSAGE}" \
-              -d "parse_mode=HTML"
+            notify-telegram:
+              status: failure
+              step: "Build & Test"
 
   deploy:
     docker:
@@ -198,11 +146,15 @@ jobs:
               fi
             done
 
-      # Notify Render deployment status
       - notify-telegram:
           status: success
           step: "Deploy"
-          service: "Render"
+      - run:
+          when: on_fail
+          command: |
+            notify-telegram:
+              status: failure
+              step: "Deploy"
 
 workflows:
   version: 2
