@@ -5,7 +5,7 @@ describe('GET /', () => {
   it('should return Hello World message', async () => {
     const res = await request(app).get('/');
     expect(res.statusCode).toBe(200);
-    expect(res.body.message).toBe('Hello World!');
+    expect(res.body.message).toBe('Hello World! test 1nd');
   });
 });
 
