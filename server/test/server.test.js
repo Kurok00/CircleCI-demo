@@ -1,5 +1,5 @@
 const request = require('supertest');
-const mongoose = require('mongoose');
+// Remove unused mongoose import
 const { app, closeServer, connectDB } = require('../server');
 
 beforeAll(async () => {
