@@ -1,7 +1,8 @@
 # Note App with DevOps Pipeline
 
 A full-stack note application with modern DevOps practices including CI/CD pipeline, Docker containerization, and cloud deployment.
- Backend:
+
+✅ Backend:
 🔗 https://circleci-demo.onrender.com
 
 ✅ Frontend:
