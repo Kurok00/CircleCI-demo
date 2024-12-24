@@ -56,9 +56,28 @@ jobs:
       - image: cimg/node:18.0
     steps:
       - checkout
+      - run:
+          name: Build Project
+          command: |
+            cd server
+            if npm install; then
+              notify-telegram:
+                status: success
+                step: "Build"
+            else
+              notify-telegram:
+                status: failed
+                step: "Build"
+              exit 1
+            fi
       - notify-telegram:
           status: success
           step: "Build"
+          when: on_success
+      - notify-telegram:
+          status: failed
+          step: "Build"
+          when: on_fail
 
   deploy:
     docker:
@@ -67,18 +86,17 @@ jobs:
       - checkout
       - run:
           name: Deploy to Production
+          no_output_timeout: 30m
           command: |
             echo "Deploying to production..."
             if curl -X POST \
               -H "Accept: application/json" \
               -H "Content-Type: application/json" \
               "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"; then
-              # If deploy succeeds
               notify-telegram:
                 status: success
                 step: "Deploy"
             else
-              # If deploy fails
               notify-telegram:
                 status: failed
                 step: "Deploy"
