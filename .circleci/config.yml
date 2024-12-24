@@ -50,6 +50,8 @@ jobs:
           command: |
             cd server
             npm install eslint --save-dev
+            npm install  # Ensure package-lock.json is in sync
+            npm ci  # Clean install dependencies
             # Store lint result
             npm run lint
             LINT_RESULT=$?
