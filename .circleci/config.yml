@@ -28,27 +28,12 @@ commands:
             COMMIT_HASH=$(git rev-parse --short HEAD)
             COMMIT_URL="https://github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/commit/$CIRCLE_SHA1"
             
-            # Escape special characters and create message with proper line breaks
-            MESSAGE=$(cat <<EOF
-            ${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>
+            MESSAGE="${EMOJI} <b>${CIRCLE_PROJECT_REPONAME}</b>%0A%0A🔄 <b>Trạng thái:</b> << parameters.step >> ${STATUS}%0A👤 <b>Branch:</b> ${CIRCLE_BRANCH}%0A🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}%0A📝 <b>Commit:</b> <a href='${COMMIT_URL}'>${COMMIT_HASH}</a>%0A💬 <b>Message:</b> ${COMMIT_MSG}%0A⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')"
             
-            🔄 <b>Trạng thái:</b> << parameters.step >> ${STATUS}
-            👤 <b>Branch:</b> ${CIRCLE_BRANCH}
-            🏗️ <b>Build:</b> #${CIRCLE_BUILD_NUM}
-            📝 <b>Commit:</b> <a href="${COMMIT_URL}">${COMMIT_HASH}</a>
-            💬 <b>Message:</b> ${COMMIT_MSG}
-            ⏱️ <b>Thời gian:</b> $(date '+%Y-%m-%d %H:%M:%S')
-EOF
-            )
-            
-            # URL encode the message
-            encoded_message=$(echo "$MESSAGE" | jq -sRr @uri)
-            
-            # Send to Telegram
             curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
-              --data-urlencode "chat_id=6894773989" \
-              --data-urlencode "text=$MESSAGE" \
-              --data-urlencode "parse_mode=HTML"
+              -d "chat_id=6894773989" \
+              -d "text=${MESSAGE}" \
+              -d "parse_mode=HTML"
 
 jobs:
   build:
@@ -67,6 +52,7 @@ jobs:
       - notify-telegram:
           status: failed
           step: "Build"
+          when: on_fail
 
   deploy:
     docker:
@@ -80,18 +66,10 @@ jobs:
             curl -X POST \
               -H "Accept: application/json" \
               -H "Content-Type: application/json" \
-          command: |
-            echo "Deploying to production..."
-            if ! curl -X POST \
-              -H "Accept: application/json" \
-              -H "Content-Type: application/json" \
-              "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"; then
-              exit 1
-            fi
+              "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"
       - notify-telegram:
           status: success
           step: "Deploy"
-          when: on_success
       - notify-telegram:
           status: failed
           step: "Deploy"
