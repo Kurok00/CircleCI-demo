@@ -94,6 +94,23 @@ app.get('/api/status', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
+// Add webhook endpoint handler
+app.post('/webhook/circle-ci', (req, res) => {
+  const { outcome, build_num, reponame } = req.body;
+  
+  console.log(`Received CircleCI webhook: ${outcome} for build #${build_num} of ${reponame}`);
+  
+  // Handle the webhook notification
+  // You can add more logic here if needed
+  
+  res.status(200).json({ 
+    message: 'Webhook received',
+    outcome,
+    build: build_num,
+    repo: reponame
+  });
+});
+
 // Thêm error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
