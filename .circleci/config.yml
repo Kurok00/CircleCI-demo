@@ -28,6 +28,9 @@ commands:
             # Create notification message
             MESSAGE="${EMOJI} *<< parameters.step >>*%0A%0A*Project:* ${CIRCLE_PROJECT_REPONAME}%0A*Branch:* ${CIRCLE_BRANCH}%0A*Status:* ${STATUS}%0A*Build:* #${CIRCLE_BUILD_NUM}%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')"
             
+            # Escape special characters
+            MESSAGE=$(echo "$MESSAGE" | sed 's/\&/\\&/g' | sed 's/\*/\\*/g' | sed 's/\_/\\_/g' | sed 's/\`/\\`/g')
+            
             # Send to Telegram
             curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
               -d "chat_id=6894773989" \
@@ -145,6 +148,34 @@ jobs:
                 sleep 10
               fi
             done
+
+            # Create Render deployment status message
+            if [ $BACKEND_OK -eq 1 ]; then
+              BACKEND_STATUS_MSG="hoạt động"
+              BACKEND_EMOJI="✅"
+            else
+              BACKEND_STATUS_MSG="không hoạt động"
+              BACKEND_EMOJI="❌"
+            fi
+
+            if [ $FRONTEND_OK -eq 1 ]; then
+              FRONTEND_STATUS_MSG="hoạt động"
+              FRONTEND_EMOJI="✅"
+            else
+              FRONTEND_STATUS_MSG="không hoạt động"
+              FRONTEND_EMOJI="❌"
+            fi
+
+            RENDER_MESSAGE="🚀 *Render Deployment Status*%0A%0A${BACKEND_EMOJI} *Backend:* ${BACKEND_STATUS_MSG}%0A🔗 https://circleci-demo.onrender.com%0A%0A${FRONTEND_EMOJI} *Frontend:* ${FRONTEND_STATUS_MSG}%0A🔗 https://circleci-demo-1.onrender.com%0A%0A⏱️ *Thời gian:* $(date '+%Y-%m-%d %H:%M:%S')"
+            
+            # Escape special characters
+            RENDER_MESSAGE=$(echo "$RENDER_MESSAGE" | sed 's/\&/\\&/g' | sed 's/\*/\\*/g' | sed 's/\_/\\_/g' | sed 's/\`/\\`/g')
+            
+            # Send Render deployment status to Telegram
+            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+              -d "chat_id=6894773989" \
+              -d "text=${RENDER_MESSAGE}" \
+              -d "parse_mode=Markdown"
 
       - notify-telegram:
           status: success
