@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../server');
+const { app, closeServer } = require('../server');
 
 describe('GET /', () => {
   it('should return Hello World message', async () => {
@@ -16,4 +16,9 @@ describe('GET /api/status', () => {
     expect(res.body.status).toBe('OK');
     expect(res.body).toHaveProperty('timestamp');
   });
+});
+
+// Thêm afterAll để đóng server sau khi tests hoàn thành
+afterAll(async () => {
+  await closeServer();
 });

@@ -12,8 +12,17 @@ app.get('/api/status', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
-module.exports = app;
+// Thêm function để đóng server
+const closeServer = () => {
+  return new Promise((resolve) => {
+    server.close(() => {
+      resolve();
+    });
+  });
+};
+
+module.exports = { app, closeServer };
