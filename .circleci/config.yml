@@ -53,13 +53,15 @@ jobs:
           command: |
             cd server
             npm install  # Ensure package-lock.json is in sync
-            git diff --exit-code || (echo "package-lock.json updated, committing changes" && git add package-lock.json && git commit -m "Update package-lock.json")
+            git add package-lock.json
+            git diff --exit-code || (echo "package-lock.json updated, committing changes" && git commit -m "Update package-lock.json")
       - run:
           name: Install Client Dependencies
           command: |
             cd client
             npm install  # Ensure package-lock.json is in sync
-            git diff --exit-code || (echo "package-lock.json updated, committing changes" && git add package-lock.json && git commit -m "Update package-lock.json")
+            git add package-lock.json
+            git diff --exit-code || (echo "package-lock.json updated, committing changes" && git commit -m "Update package-lock.json")
       - run:
           name: Run Linting and Tests
           command: |
