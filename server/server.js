@@ -12,7 +12,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(cors({
-  origin: ['http://localhost:3001', 'http://localhost:3000'],
+  origin: ['http://localhost:3001', 'http://localhost:3000', 'https://your-render-frontend-url.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -20,8 +20,11 @@ app.use(cors({
 // Modified mongoose connection
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB');
+    const mongoURI = process.env.NODE_ENV === 'production' 
+      ? process.env.MONGODB_PROD_URI 
+      : process.env.MONGODB_URI;
+    await mongoose.connect(mongoURI);
+    console.log('Connected to MongoDB:', process.env.NODE_ENV);
   } catch (err) {
     console.error('MongoDB connection error:', err);
     process.exit(1);

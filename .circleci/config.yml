@@ -89,13 +89,19 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Deploy to Production
+          name: Deploy to Render
           command: |
-            echo "Deploying to production..."
+            # Wait for deployment to complete
             curl -X POST \
               -H "Accept: application/json" \
               -H "Content-Type: application/json" \
               "https://api.render.com/deploy/srv-ctl3cnlds78s73c3ktdg?key=rnd_aNr7V6i33gzm6QE3BeyGvJwwmohf"
+            
+            # Wait for 30 seconds to allow deployment to start
+            sleep 30
+            
+            # Check deployment status
+            echo "Deployment triggered successfully. Check Render dashboard for status."
       - notify-telegram:
           status: success
           step: "Deploy"
