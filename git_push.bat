@@ -1,4 +1,3 @@
-
 @echo off
 echo ====== Git Auto Push Script ======
 echo.
@@ -12,8 +11,8 @@ set /p commit_msg="Enter commit message: "
 :: Commit with message
 git commit -m "%commit_msg%"
 
-:: Push to master
-git push origin master
+:: Force push to master
+git push origin master --force
 
 :: Show status
 echo.
