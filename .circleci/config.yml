@@ -73,11 +73,13 @@ jobs:
           status: success
           step: "Build"
       - run:
+          name: Notify Failure
           when: on_fail
           command: |
-            notify-telegram:
-              status: failure
-              step: "Build"
+            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+              -d "chat_id=6894773989" \
+              -d "text=❌ *Build*%0A%0A*Project:* CircleCI Demo%0A*Branch:* ${CIRCLE_BRANCH}%0A*Status:* thất bại%0A*Build:* #${CIRCLE_BUILD_NUM}%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')" \
+              -d "parse_mode=Markdown"
 
   deploy:
     docker:
@@ -166,7 +168,7 @@ jobs:
               FRONTEND_EMOJI="❌"
             fi
 
-            RENDER_MESSAGE="🚀 *Render Deployment Status*%0A%0A${BACKEND_EMOJI} *Backend:* ${BACKEND_STATUS_MSG}%0A🔗 https://circleci-demo.onrender.com%0A%0A${FRONTEND_EMOJI} *Frontend:* ${FRONTEND_STATUS_MSG}%0A🔗 https://circleci-demo-1.onrender.com%0A%0A⏱️ *Thời gian:* $(date '+%Y-%m-%d %H:%M:%S')"
+            RENDER_MESSAGE="🚀 *Render Deployment Status*%0A%0A${BACKEND_EMOJI} *Backend:* ${BACKEND_STATUS_MSG}%0A🔗 https://circleci-demo.onrender.com%0A%0A${FRONTEND_EMOJI} *Frontend:* ${FRONTEND_STATUS_MSG}%0A🔗 https://circleci-demo-1.onrender.com%0A⏱️ *Thời gian:* $(date '+%Y-%m-%d %H:%M:%S')"
             
             # Escape special characters
             RENDER_MESSAGE=$(echo "$RENDER_MESSAGE" | sed 's/\&/\\&/g' | sed 's/\*/\\*/g' | sed 's/\_/\\_/g' | sed 's/\`/\\`/g')
@@ -181,11 +183,13 @@ jobs:
           status: success
           step: "Deploy"
       - run:
+          name: Notify Failure
           when: on_fail
           command: |
-            notify-telegram:
-              status: failure
-              step: "Deploy"
+            curl -s "https://api.telegram.org/bot7801299262:AAFTUsvVxL59EzZHQfAcdLYOgb4kK5B42Fg/sendMessage" \
+              -d "chat_id=6894773989" \
+              -d "text=❌ *Deploy*%0A%0A*Project:* CircleCI Demo%0A*Branch:* ${CIRCLE_BRANCH}%0A*Status:* thất bại%0A*Build:* #${CIRCLE_BUILD_NUM}%0A*Time:* $(date '+%Y-%m-%d %H:%M:%S')" \
+              -d "parse_mode=Markdown"
 
 workflows:
   version: 2
