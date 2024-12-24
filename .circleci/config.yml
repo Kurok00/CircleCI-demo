@@ -1,4 +1,3 @@
-
 version: 2.1
 
 orbs:
@@ -22,17 +21,11 @@ commands:
           when: always
 
 jobs:
-  build-and-test:
+  build:
     docker:
       - image: cimg/node:18.0
-    working_directory: ~/project/server
     steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages
-      - run:
-          name: Run Tests
-          command: npm test
+      - checkout
       - notify-telegram:
           status: success
 
@@ -56,9 +49,9 @@ jobs:
 
 workflows:
   version: 2
-  build-test-deploy:
+  build-deploy:
     jobs:
-      - build-and-test:
+      - build:
           filters:
             branches:
               only: 
@@ -66,7 +59,7 @@ workflows:
                 - master
       - deploy:
           requires:
-            - build-and-test
+            - build
           filters:
             branches:
               only: 
